@@ -20,14 +20,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:copilotCrossRef.open",
-    "onCommand:copilotCrossRef.askSelection",
-    "onCommand:copilotCrossRef.askPrompt",
-    "onCommand:copilotCrossRef.setOpenAIApiKey",
-    "onCommand:copilotCrossRef.clearOpenAIApiKey",
-    "onCommand:copilotCrossRef.debateSelection",
-    "onCommand:copilotCrossRef.debatePrompt"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -53,12 +46,48 @@
         "title": "Copilot Cross-Reference: Clear OpenAI API Key"
       },
       {
+        "command": "copilotCrossRef.setAzureOpenAIApiKey",
+        "title": "Copilot Cross-Reference: Set Azure OpenAI API Key"
+      },
+      {
+        "command": "copilotCrossRef.clearAzureOpenAIApiKey",
+        "title": "Copilot Cross-Reference: Clear Azure OpenAI API Key"
+      },
+      {
+        "command": "copilotCrossRef.setDeepSeekApiKey",
+        "title": "Copilot Cross-Reference: Set DeepSeek API Key"
+      },
+      {
+        "command": "copilotCrossRef.clearDeepSeekApiKey",
+        "title": "Copilot Cross-Reference: Clear DeepSeek API Key"
+      },
+      {
         "command": "copilotCrossRef.debateSelection",
         "title": "Copilot Cross-Reference: Debate in ChatGPT (Selection)"
       },
       {
         "command": "copilotCrossRef.debatePrompt",
         "title": "Copilot Cross-Reference: Debate in ChatGPT (Prompt)"
+      },
+      {
+        "command": "micro.startConversation",
+        "title": "Micro Co-Cross: Start Conversation (Model A ↔ Model B)"
+      },
+      {
+        "command": "micro.stopConversation",
+        "title": "Micro Co-Cross: Stop Conversation"
+      },
+      {
+        "command": "micro.sendToModelA",
+        "title": "Micro Co-Cross: Send User Message → Model A"
+      },
+      {
+        "command": "micro.sendToModelB",
+        "title": "Micro Co-Cross: Send User Message → Model B"
+      },
+      {
+        "command": "micro.exportTranscript",
+        "title": "Micro Co-Cross: Export Transcript"
       }
     ],
     "configuration": {
@@ -116,6 +145,69 @@
           "type": "boolean",
           "default": true,
           "description": "Copy the generated Copilot prompt to your clipboard (recommended, since prefill via URL is not guaranteed)."
+        },
+
+        "copilotCrossRef.broker.modelA.provider": {
+          "type": "string",
+          "enum": ["chatgpt", "azureOpenai", "lmstudio", "ollama", "deepseek"],
+          "default": "chatgpt",
+          "description": "Provider for Model A in the conversation broker."
+        },
+        "copilotCrossRef.broker.modelA.model": {
+          "type": "string",
+          "default": "gpt-4.1",
+          "description": "Model name (or Azure deployment name) for Model A."
+        },
+        "copilotCrossRef.broker.modelA.baseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1",
+          "description": "Base URL/endpoint for Model A (OpenAI: https://api.openai.com/v1; LM Studio: http://localhost:1234/v1; Ollama: http://localhost:11434/v1; Azure OpenAI: your endpoint URL)."
+        },
+        "copilotCrossRef.broker.modelA.systemPrompt": {
+          "type": "string",
+          "default": "You are Speaker A. Be precise and critical when needed.",
+          "description": "System prompt for Model A."
+        },
+
+        "copilotCrossRef.broker.modelB.provider": {
+          "type": "string",
+          "enum": ["chatgpt", "azureOpenai", "lmstudio", "ollama", "deepseek"],
+          "default": "lmstudio",
+          "description": "Provider for Model B in the conversation broker."
+        },
+        "copilotCrossRef.broker.modelB.model": {
+          "type": "string",
+          "default": "local-model",
+          "description": "Model name (or Azure deployment name) for Model B."
+        },
+        "copilotCrossRef.broker.modelB.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:1234/v1",
+          "description": "Base URL/endpoint for Model B."
+        },
+        "copilotCrossRef.broker.modelB.systemPrompt": {
+          "type": "string",
+          "default": "You are Speaker B. Be constructive and propose improvements.",
+          "description": "System prompt for Model B."
+        },
+
+        "copilotCrossRef.broker.maxTurns": {
+          "type": "number",
+          "default": 8,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Maximum number of assistant turns (A or B responses) before stopping."
+        },
+        "copilotCrossRef.broker.stopCondition": {
+          "type": "string",
+          "enum": ["maxTurns", "checklistEmpty"],
+          "default": "maxTurns",
+          "description": "Stop condition used by the conversation broker. 'checklistEmpty' stops early when the last assistant message has no unchecked checklist items (e.g. '- [ ]')."
+        },
+        "copilotCrossRef.broker.azureApiVersion": {
+          "type": "string",
+          "default": "2024-02-15-preview",
+          "description": "Azure OpenAI API version (used when provider is azureOpenai)."
         }
       }
     }

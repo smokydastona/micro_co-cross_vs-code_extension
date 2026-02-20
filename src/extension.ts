@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { buildPrompt, buildPromptFromSelection, getConfig, getCopilotBaseUrl, getCopilotUrlWithQuery, guideWindowsCopilot, openCopilot } from './copilot';
 import { askChatGPT, clearOpenAIApiKey, debateChatGPTUntilChecklistEmpty, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
 import { showTextPanel } from './webview';
+import { registerConversationCommands } from './commands';
+import { AZURE_OPENAI_KEY_SECRET, DEEPSEEK_KEY_SECRET, clearSecret, setSecret } from './config/secrets';
 
 const ONBOARDING_SUPPRESS_KEY = 'copilotCrossRef.suppressOnboardingPrompt';
 
@@ -48,6 +50,9 @@ export function activate(context: vscode.ExtensionContext) {
   // Fire-and-forget onboarding prompt; keep activation snappy.
   void maybePromptForOpenAIKey(context);
 
+  // Multi-model conversation broker commands.
+  context.subscriptions.push(...registerConversationCommands(context));
+
   context.subscriptions.push(
     vscode.commands.registerCommand('copilotCrossRef.setOpenAIApiKey', async () => {
       const apiKey = await vscode.window.showInputBox({
@@ -73,6 +78,56 @@ export function activate(context: vscode.ExtensionContext) {
       // If user clears the key, allow onboarding to help again.
       await context.globalState.update(ONBOARDING_SUPPRESS_KEY, false);
       vscode.window.showInformationMessage('OpenAI API key cleared.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.setAzureOpenAIApiKey', async () => {
+      const apiKey = await vscode.window.showInputBox({
+        title: 'Set Azure OpenAI API Key',
+        prompt: 'Enter your Azure OpenAI API key (stored in VS Code Secret Storage)',
+        password: true,
+        ignoreFocusOut: true
+      });
+
+      if (!apiKey) {
+        return;
+      }
+
+      await setSecret(context, AZURE_OPENAI_KEY_SECRET, apiKey.trim());
+      vscode.window.showInformationMessage('Azure OpenAI API key saved.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.clearAzureOpenAIApiKey', async () => {
+      await clearSecret(context, AZURE_OPENAI_KEY_SECRET);
+      vscode.window.showInformationMessage('Azure OpenAI API key cleared.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.setDeepSeekApiKey', async () => {
+      const apiKey = await vscode.window.showInputBox({
+        title: 'Set DeepSeek API Key',
+        prompt: 'Enter your DeepSeek API key (stored in VS Code Secret Storage)',
+        password: true,
+        ignoreFocusOut: true
+      });
+
+      if (!apiKey) {
+        return;
+      }
+
+      await setSecret(context, DEEPSEEK_KEY_SECRET, apiKey.trim());
+      vscode.window.showInformationMessage('DeepSeek API key saved.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.clearDeepSeekApiKey', async () => {
+      await clearSecret(context, DEEPSEEK_KEY_SECRET);
+      vscode.window.showInformationMessage('DeepSeek API key cleared.');
     })
   );
 

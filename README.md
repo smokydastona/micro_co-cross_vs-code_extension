@@ -5,6 +5,8 @@ Cross-check text/code in VS Code using either:
 - **Microsoft Copilot (web)** opened inside VS Code (Simple Browser), or
 - **ChatGPT (OpenAI API)** with results shown in a VS Code panel.
 
+It also includes a **Conversation Broker** mode that can run an automated back-and-forth between **Model A ↔ Model B** (ChatGPT, Ollama, LM Studio, etc.) with a live transcript panel.
+
 ## Commands
 
 - **Copilot Cross-Reference: Open Microsoft Copilot**
@@ -12,8 +14,20 @@ Cross-check text/code in VS Code using either:
 - **Copilot Cross-Reference: Ask Microsoft Copilot (Prompt)**
 - **Copilot Cross-Reference: Set OpenAI API Key**
 - **Copilot Cross-Reference: Clear OpenAI API Key**
+- **Copilot Cross-Reference: Set Azure OpenAI API Key**
+- **Copilot Cross-Reference: Clear Azure OpenAI API Key**
+- **Copilot Cross-Reference: Set DeepSeek API Key**
+- **Copilot Cross-Reference: Clear DeepSeek API Key**
 - **Copilot Cross-Reference: Debate in ChatGPT (Selection)**
 - **Copilot Cross-Reference: Debate in ChatGPT (Prompt)**
+
+Conversation Broker (Model A ↔ Model B):
+
+- **Micro Co-Cross: Start Conversation (Model A ↔ Model B)**
+- **Micro Co-Cross: Stop Conversation**
+- **Micro Co-Cross: Send User Message → Model A**
+- **Micro Co-Cross: Send User Message → Model B**
+- **Micro Co-Cross: Export Transcript**
 
 ## How it “cross-references”
 
@@ -50,6 +64,30 @@ So this extension provides a practical workflow:
 - `copilotCrossRef.promptTemplate`: Template for the prompt. Use `{{text}}`.
 - `copilotCrossRef.copyPromptToClipboard`: Copy prompt to clipboard (on by default).
 
+### Conversation Broker settings
+
+These control **Micro Co-Cross** conversations (Model A ↔ Model B):
+
+- `copilotCrossRef.broker.modelA.provider`: `chatgpt | azureOpenai | lmstudio | ollama | deepseek`
+- `copilotCrossRef.broker.modelA.model`: Model name (or Azure deployment name)
+- `copilotCrossRef.broker.modelA.baseUrl`: Base URL / endpoint
+- `copilotCrossRef.broker.modelA.systemPrompt`: System prompt for Model A
+- `copilotCrossRef.broker.modelB.provider`: `chatgpt | azureOpenai | lmstudio | ollama | deepseek`
+- `copilotCrossRef.broker.modelB.model`
+- `copilotCrossRef.broker.modelB.baseUrl`
+- `copilotCrossRef.broker.modelB.systemPrompt`
+- `copilotCrossRef.broker.maxTurns`: Maximum number of assistant turns (A or B responses)
+- `copilotCrossRef.broker.stopCondition`: `maxTurns | checklistEmpty`
+- `copilotCrossRef.broker.azureApiVersion`: Azure OpenAI API version when using `azureOpenai`
+
+Provider notes:
+
+- `chatgpt`: requires an OpenAI API key (use **Copilot Cross-Reference: Set OpenAI API Key**).
+- `lmstudio`: no key required; default base URL `http://localhost:1234/v1`.
+- `ollama`: no key required; default base URL `http://localhost:11434/v1`.
+- `azureOpenai`: requires an Azure OpenAI API key (use **Copilot Cross-Reference: Set Azure OpenAI API Key**).
+- `deepseek`: requires a DeepSeek API key (use **Copilot Cross-Reference: Set DeepSeek API Key**).
+
 ## ChatGPT setup
 
 1. Set `copilotCrossRef.target` to `chatgpt`.
@@ -67,6 +105,16 @@ Notes:
 - Run **Debate in ChatGPT (Prompt)** and type your idea.
 
 The debate loop continues until the **Action Items** checklist contains no unchecked items (`- [ ]`), or until `copilotCrossRef.debateMaxRounds` is reached.
+
+## Conversation Broker (Model A ↔ Model B)
+
+1. Configure Model A and Model B via Settings (see **Conversation Broker settings** above).
+2. Run **Micro Co-Cross: Start Conversation (Model A ↔ Model B)**.
+3. Watch the live streaming transcript panel.
+4. Use **Stop Conversation** to abort the current run (the transcript stays open for review/export).
+5. Use **Export Transcript** to save as `.md` or `.json`.
+
+If you select `checklistEmpty` as the stop condition, the broker will stop early when the last assistant message has no unchecked checklist items (no lines like `- [ ] ...`).
 
 ## Install
 
