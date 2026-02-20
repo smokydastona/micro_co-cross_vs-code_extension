@@ -2,7 +2,7 @@
   "name": "copilot-cross-reference",
   "displayName": "Copilot Cross-Reference",
   "description": "Open Microsoft Copilot inside VS Code and send prompts/selections for cross-reference.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "local",
   "license": "MIT",
   "repository": {

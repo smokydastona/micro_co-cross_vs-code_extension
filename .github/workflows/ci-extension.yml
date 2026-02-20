@@ -33,16 +33,17 @@ jobs:
         run: npm run package
 
       - name: Read extension metadata
+        id: meta
         shell: bash
         run: |
           EXT_NAME="$(node -p 'require("./package.json").name')"
           EXT_VERSION="$(node -p 'require("./package.json").version')"
-          echo "EXT_NAME=$EXT_NAME" >> "$GITHUB_ENV"
-          echo "EXT_VERSION=$EXT_VERSION" >> "$GITHUB_ENV"
+          echo "ext_name=$EXT_NAME" >> "$GITHUB_OUTPUT"
+          echo "ext_version=$EXT_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vsix-${{ env.EXT_NAME }}-${{ env.EXT_VERSION }}-${{ matrix.os }}
+          name: vsix-${{ steps.meta.outputs.ext_name }}-${{ steps.meta.outputs.ext_version }}-${{ matrix.os }}
           path: "*.vsix"
           if-no-files-found: error
