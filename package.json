@@ -15,7 +15,9 @@
     "onCommand:copilotCrossRef.askSelection",
     "onCommand:copilotCrossRef.askPrompt",
     "onCommand:copilotCrossRef.setOpenAIApiKey",
-    "onCommand:copilotCrossRef.clearOpenAIApiKey"
+    "onCommand:copilotCrossRef.clearOpenAIApiKey",
+    "onCommand:copilotCrossRef.debateSelection",
+    "onCommand:copilotCrossRef.debatePrompt"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -39,6 +41,14 @@
       {
         "command": "copilotCrossRef.clearOpenAIApiKey",
         "title": "Copilot Cross-Reference: Clear OpenAI API Key"
+      },
+      {
+        "command": "copilotCrossRef.debateSelection",
+        "title": "Copilot Cross-Reference: Debate in ChatGPT (Selection)"
+      },
+      {
+        "command": "copilotCrossRef.debatePrompt",
+        "title": "Copilot Cross-Reference: Debate in ChatGPT (Prompt)"
       }
     ],
     "configuration": {
@@ -52,7 +62,7 @@
         },
         "copilotCrossRef.openaiModel": {
           "type": "string",
-          "default": "gpt-4o-mini",
+          "default": "gpt-4.1",
           "description": "OpenAI model to use when target is 'chatgpt'."
         },
         "copilotCrossRef.openaiBaseUrl": {

@@ -9,6 +9,8 @@ Opens **Microsoft Copilot** inside VS Code (using the built-in Simple Browser) *
 - **Copilot Cross-Reference: Ask Microsoft Copilot (Prompt)**
 - **Copilot Cross-Reference: Set OpenAI API Key**
 - **Copilot Cross-Reference: Clear OpenAI API Key**
+- **Copilot Cross-Reference: Debate in ChatGPT (Selection)**
+- **Copilot Cross-Reference: Debate in ChatGPT (Prompt)**
 
 ## How it “cross-references”
 
@@ -17,6 +19,11 @@ VS Code extensions don’t have a supported API to read GitHub Copilot’s inter
 Also, **Windows Copilot** doesn’t expose a supported VS Code extension API to open it, send it text, or read responses.
 
 If you choose the `chatgpt` target, the extension uses the **OpenAI API** (with your API key stored in VS Code Secret Storage) and shows the response in a VS Code panel.
+
+The “Debate” commands run two ChatGPT passes:
+
+1. **Critic**: finds issues/risks/alternatives.
+2. **Builder**: produces an improved version + action items.
 
 So this extension provides a practical workflow:
 
@@ -41,6 +48,11 @@ So this extension provides a practical workflow:
 1. Set `copilotCrossRef.target` to `chatgpt`.
 2. Run **Copilot Cross-Reference: Set OpenAI API Key**.
 3. Use either **Ask … About Selection** or **Ask … (Prompt)**.
+
+## Debate mode
+
+- Select text and run **Debate in ChatGPT (Selection)**, or
+- Run **Debate in ChatGPT (Prompt)** and type your idea.
 
 ## Run & debug
 

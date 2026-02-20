@@ -44,3 +44,59 @@ export async function askChatGPT(opts: {
   }
   return text.trim();
 }
+
+export async function debateChatGPT(opts: {
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+  topicText: string;
+}): Promise<{ critic: string; builder: string; report: string }> {
+  const client = createOpenAIClient(opts.apiKey, opts.baseUrl);
+  const topic = opts.topicText.trim();
+
+  const criticPrompt = [
+    'You are Critic. Your job is to find flaws, missing context, incorrect assumptions, security risks, edge cases, and better alternatives.',
+    'Be direct and specific. Use short bullets. If code is present, call out likely bugs and improvements.',
+    '',
+    'CONTENT TO REVIEW:',
+    topic
+  ].join('\n');
+
+  const criticResp = await client.responses.create({
+    model: opts.model,
+    input: criticPrompt
+  });
+
+  const critic = (criticResp.output_text || '').trim() || '(No critic output returned.)';
+
+  const builderPrompt = [
+    'You are Builder. Your job is to produce an improved version, incorporating Critic feedback where appropriate.',
+    'Output structure:',
+    '1) Improved Answer (or Improved Code/Plan)',
+    '2) Action Items (checklist)',
+    '3) Risks / Tradeoffs',
+    '',
+    'ORIGINAL CONTENT:',
+    topic,
+    '',
+    'CRITIC FEEDBACK:',
+    critic
+  ].join('\n');
+
+  const builderResp = await client.responses.create({
+    model: opts.model,
+    input: builderPrompt
+  });
+
+  const builder = (builderResp.output_text || '').trim() || '(No builder output returned.)';
+
+  const report = [
+    '=== Critic ===',
+    critic,
+    '',
+    '=== Builder ===',
+    builder
+  ].join('\n');
+
+  return { critic, builder, report };
+}

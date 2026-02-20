@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { buildPrompt, buildPromptFromSelection, getConfig, getCopilotBaseUrl, getCopilotUrlWithQuery, guideWindowsCopilot, openCopilot } from './copilot';
-import { askChatGPT, clearOpenAIApiKey, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
+import { askChatGPT, clearOpenAIApiKey, debateChatGPT, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
 import { showTextPanel } from './webview';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -26,6 +26,87 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('copilotCrossRef.clearOpenAIApiKey', async () => {
       await clearOpenAIApiKey(context);
       vscode.window.showInformationMessage('OpenAI API key cleared.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.debateSelection', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showErrorMessage('No active editor found.');
+        return;
+      }
+
+      const selectionText = editor.document.getText(editor.selection).trim();
+      if (!selectionText) {
+        vscode.window.showErrorMessage('No text selected. Select text to debate.');
+        return;
+      }
+
+      const config = getConfig();
+      const apiKey = await getOpenAIApiKey(context);
+      if (!apiKey) {
+        vscode.window.showErrorMessage('OpenAI API key not set. Run “Copilot Cross-Reference: Set OpenAI API Key” first.');
+        return;
+      }
+
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: `Debating in ChatGPT (${config.openaiModel})…`
+        },
+        async () => {
+          const { report } = await debateChatGPT({
+            apiKey,
+            baseUrl: config.openaiBaseUrl,
+            model: config.openaiModel,
+            topicText: selectionText
+          });
+          showTextPanel({ title: 'ChatGPT Debate', bodyText: report });
+        }
+      );
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.debatePrompt', async () => {
+      const config = getConfig();
+      const apiKey = await getOpenAIApiKey(context);
+      if (!apiKey) {
+        vscode.window.showErrorMessage('OpenAI API key not set. Run “Copilot Cross-Reference: Set OpenAI API Key” first.');
+        return;
+      }
+
+      const text = await vscode.window.showInputBox({
+        title: 'Debate in ChatGPT',
+        prompt: 'Enter the text/idea you want Critic and Builder to debate',
+        ignoreFocusOut: true
+      });
+
+      if (text === undefined) {
+        return;
+      }
+
+      const topicText = text.trim();
+      if (!topicText) {
+        return;
+      }
+
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: `Debating in ChatGPT (${config.openaiModel})…`
+        },
+        async () => {
+          const { report } = await debateChatGPT({
+            apiKey,
+            baseUrl: config.openaiBaseUrl,
+            model: config.openaiModel,
+            topicText
+          });
+          showTextPanel({ title: 'ChatGPT Debate', bodyText: report });
+        }
+      );
     })
   );
 
