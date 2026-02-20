@@ -1,0 +1,75 @@
+{
+  "name": "copilot-cross-reference",
+  "displayName": "Copilot Cross-Reference",
+  "description": "Open Microsoft Copilot inside VS Code and send prompts/selections for cross-reference.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:copilotCrossRef.open",
+    "onCommand:copilotCrossRef.askSelection",
+    "onCommand:copilotCrossRef.askPrompt"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilotCrossRef.open",
+        "title": "Copilot Cross-Reference: Open Microsoft Copilot"
+      },
+      {
+        "command": "copilotCrossRef.askSelection",
+        "title": "Copilot Cross-Reference: Ask Microsoft Copilot About Selection"
+      },
+      {
+        "command": "copilotCrossRef.askPrompt",
+        "title": "Copilot Cross-Reference: Ask Microsoft Copilot (Prompt)"
+      }
+    ],
+    "configuration": {
+      "title": "Copilot Cross-Reference",
+      "properties": {
+        "copilotCrossRef.copilotUrl": {
+          "type": "string",
+          "default": "https://copilot.microsoft.com/",
+          "description": "Base URL for Microsoft Copilot web experience."
+        },
+        "copilotCrossRef.openInSimpleBrowser": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open Copilot inside VS Code using the built-in Simple Browser (falls back to external browser if unavailable)."
+        },
+        "copilotCrossRef.prefillQueryInUrl": {
+          "type": "boolean",
+          "default": false,
+          "description": "Attempt to prefill the Copilot prompt using a querystring parameter. This may stop working if the Copilot website changes."
+        },
+        "copilotCrossRef.promptTemplate": {
+          "type": "string",
+          "default": "Please cross-check the following content and point out any issues, missing context, or better alternatives.\n\n{{text}}",
+          "description": "Template used when sending text to Copilot. Use {{text}} as a placeholder for the selection/prompt."
+        },
+        "copilotCrossRef.copyPromptToClipboard": {
+          "type": "boolean",
+          "default": true,
+          "description": "Copy the generated Copilot prompt to your clipboard (recommended, since prefill via URL is not guaranteed)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p .",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.4"
+  }
+}
