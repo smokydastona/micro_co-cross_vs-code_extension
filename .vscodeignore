@@ -1,0 +1,24 @@
+# Exclude dependencies (extension runtime should not ship node_modules when using dist output)
+node_modules/**
+
+# Source and build tooling
+src/**
+**/*.ts
+tsconfig.json
+
+# Dev-only VS Code config
+.vscode/**
+
+# Git / misc
+.git/**
+.github/**
+.gitignore
+
+# Tests (if added later)
+.vscode-test/**
+
+# OS cruft
+.DS_Store
+
+# Keep dist (built extension)
+!dist/**

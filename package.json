@@ -4,6 +4,15 @@
   "description": "Open Microsoft Copilot inside VS Code and send prompts/selections for cross-reference.",
   "version": "0.0.1",
   "publisher": "local",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smokydastona/micro_co-cross_vs-code_extension.git"
+  },
+  "homepage": "https://github.com/smokydastona/micro_co-cross_vs-code_extension",
+  "bugs": {
+    "url": "https://github.com/smokydastona/micro_co-cross_vs-code_extension/issues"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -108,12 +117,14 @@
   "scripts": {
     "compile": "tsc -p .",
     "watch": "tsc -watch -p .",
+    "package": "npm run compile && vsce package",
     "vscode:prepublish": "npm run compile"
   },
   "dependencies": {
     "openai": "^4.79.0"
   },
   "devDependencies": {
+    "@vscode/vsce": "^3.6.0",
     "@types/node": "^20.11.30",
     "@types/vscode": "^1.90.0",
     "typescript": "^5.5.4"
