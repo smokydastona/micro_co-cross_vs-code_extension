@@ -32,9 +32,15 @@ jobs:
       - name: Package VSIX
         run: npm run package
 
+      - name: Read extension metadata
+        shell: bash
+        run: |
+          echo "EXT_NAME=$(node -p \"require('./package.json').name\")" >> "$GITHUB_ENV"
+          echo "EXT_VERSION=$(node -p \"require('./package.json').version\")" >> "$GITHUB_ENV"
+
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vsix-${{ matrix.os }}
+          name: vsix-${{ env.EXT_NAME }}-${{ env.EXT_VERSION }}-${{ matrix.os }}
           path: "*.vsix"
           if-no-files-found: error
