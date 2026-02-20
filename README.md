@@ -1,6 +1,9 @@
 # Copilot Cross-Reference (VS Code Extension)
 
-Opens **Microsoft Copilot** inside VS Code (using the built-in Simple Browser) *or* uses **ChatGPT (OpenAI API)** to cross-check your selection/prompt and show the result in a VS Code panel.
+Cross-check text/code in VS Code using either:
+
+- **Microsoft Copilot (web)** opened inside VS Code (Simple Browser), or
+- **ChatGPT (OpenAI API)** with results shown in a VS Code panel.
 
 ## Commands
 
@@ -24,6 +27,8 @@ The “Debate” commands run two ChatGPT passes:
 
 1. **Critic**: finds issues/risks/alternatives.
 2. **Builder**: produces an improved version + action items.
+
+Then it can keep iterating Critic → Builder until the checklist is empty (bounded by a max round setting).
 
 So this extension provides a practical workflow:
 
@@ -51,12 +56,39 @@ So this extension provides a practical workflow:
 2. Run **Copilot Cross-Reference: Set OpenAI API Key**.
 3. Use either **Ask … About Selection** or **Ask … (Prompt)**.
 
+Notes:
+
+- The API key is stored in **VS Code Secret Storage** (not in your repo).
+- If you hit “Don’t ask again” on the startup prompt, clearing the key will allow onboarding to prompt again.
+
 ## Debate mode
 
 - Select text and run **Debate in ChatGPT (Selection)**, or
 - Run **Debate in ChatGPT (Prompt)** and type your idea.
 
 The debate loop continues until the **Action Items** checklist contains no unchecked items (`- [ ]`), or until `copilotCrossRef.debateMaxRounds` is reached.
+
+## Install
+
+This repo supports two common install workflows:
+
+### Install from VSIX (local)
+
+1. In the repo folder: `npm install`
+2. Build a VSIX: `npm run package`
+3. Install the generated `.vsix`:
+	- Command line: `code --install-extension .\copilot-cross-reference-<version>.vsix`
+	- Or VS Code UI: Extensions → `...` menu → **Install from VSIX...**
+
+### Run in dev (Extension Development Host)
+
+1. `npm install`
+2. Press `F5`
+
+## Security
+
+- Never paste API keys into issues, chats, or logs.
+- If a key is ever shared accidentally, revoke/rotate it immediately.
 
 ## Run & debug
 
