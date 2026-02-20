@@ -1,10 +1,46 @@
 import * as vscode from 'vscode';
-import { buildPrompt, buildPromptFromSelection, getConfig, getCopilotBaseUrl, getCopilotUrlWithQuery, openCopilot } from './copilot';
+import { buildPrompt, buildPromptFromSelection, getConfig, getCopilotBaseUrl, getCopilotUrlWithQuery, guideWindowsCopilot, openCopilot } from './copilot';
+import { askChatGPT, clearOpenAIApiKey, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
+import { showTextPanel } from './webview';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.setOpenAIApiKey', async () => {
+      const apiKey = await vscode.window.showInputBox({
+        title: 'Set OpenAI API Key',
+        prompt: 'Enter your OpenAI API key (stored in VS Code Secret Storage)',
+        password: true,
+        ignoreFocusOut: true
+      });
+
+      if (!apiKey) {
+        return;
+      }
+
+      await setOpenAIApiKey(context, apiKey.trim());
+      vscode.window.showInformationMessage('OpenAI API key saved.');
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('copilotCrossRef.clearOpenAIApiKey', async () => {
+      await clearOpenAIApiKey(context);
+      vscode.window.showInformationMessage('OpenAI API key cleared.');
+    })
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('copilotCrossRef.open', async () => {
       const config = getConfig();
+      if (config.target === 'chatgpt') {
+        vscode.window.showInformationMessage('ChatGPT target does not have a homepage to open. Use an “Ask …” command instead.');
+        return;
+      }
+      if (config.target === 'windows') {
+        await guideWindowsCopilot(false);
+        return;
+      }
+
       const url = getCopilotBaseUrl(config);
       await openCopilot(url, config.openInSimpleBrowser);
     })
@@ -27,6 +63,37 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (config.copyPromptToClipboard) {
         await vscode.env.clipboard.writeText(prompt);
+      }
+
+      if (config.target === 'chatgpt') {
+        const apiKey = await getOpenAIApiKey(context);
+        if (!apiKey) {
+          vscode.window.showErrorMessage('OpenAI API key not set. Run “Copilot Cross-Reference: Set OpenAI API Key” first.');
+          return;
+        }
+
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: `Asking ChatGPT (${config.openaiModel})…`
+          },
+          async () => {
+            const answer = await askChatGPT({
+              apiKey,
+              baseUrl: config.openaiBaseUrl,
+              model: config.openaiModel,
+              prompt
+            });
+            showTextPanel({ title: 'ChatGPT Cross-Reference', bodyText: answer });
+          }
+        );
+
+        return;
+      }
+
+      if (config.target === 'windows') {
+        await guideWindowsCopilot(config.copyPromptToClipboard);
+        return;
       }
 
       const url = getCopilotUrlWithQuery(config, prompt);
@@ -56,6 +123,37 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (config.copyPromptToClipboard) {
         await vscode.env.clipboard.writeText(prompt);
+      }
+
+      if (config.target === 'chatgpt') {
+        const apiKey = await getOpenAIApiKey(context);
+        if (!apiKey) {
+          vscode.window.showErrorMessage('OpenAI API key not set. Run “Copilot Cross-Reference: Set OpenAI API Key” first.');
+          return;
+        }
+
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: `Asking ChatGPT (${config.openaiModel})…`
+          },
+          async () => {
+            const answer = await askChatGPT({
+              apiKey,
+              baseUrl: config.openaiBaseUrl,
+              model: config.openaiModel,
+              prompt
+            });
+            showTextPanel({ title: 'ChatGPT Cross-Reference', bodyText: answer });
+          }
+        );
+
+        return;
+      }
+
+      if (config.target === 'windows') {
+        await guideWindowsCopilot(config.copyPromptToClipboard);
+        return;
       }
 
       const url = getCopilotUrlWithQuery(config, prompt);

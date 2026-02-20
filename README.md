@@ -1,16 +1,22 @@
 # Copilot Cross-Reference (VS Code Extension)
 
-Opens **Microsoft Copilot** inside VS Code (using the built-in Simple Browser) and helps you send prompts or your current editor selection to Copilot for cross-checking.
+Opens **Microsoft Copilot** inside VS Code (using the built-in Simple Browser) *or* uses **ChatGPT (OpenAI API)** to cross-check your selection/prompt and show the result in a VS Code panel.
 
 ## Commands
 
 - **Copilot Cross-Reference: Open Microsoft Copilot**
 - **Copilot Cross-Reference: Ask Microsoft Copilot About Selection**
 - **Copilot Cross-Reference: Ask Microsoft Copilot (Prompt)**
+- **Copilot Cross-Reference: Set OpenAI API Key**
+- **Copilot Cross-Reference: Clear OpenAI API Key**
 
 ## How it “cross-references”
 
 VS Code extensions don’t have a supported API to read GitHub Copilot’s internal “choices/decisions” directly.
+
+Also, **Windows Copilot** doesn’t expose a supported VS Code extension API to open it, send it text, or read responses.
+
+If you choose the `chatgpt` target, the extension uses the **OpenAI API** (with your API key stored in VS Code Secret Storage) and shows the response in a VS Code panel.
 
 So this extension provides a practical workflow:
 
@@ -21,11 +27,20 @@ So this extension provides a practical workflow:
 
 ## Settings
 
+- `copilotCrossRef.target`: `web` (default) opens copilot.microsoft.com; `windows` copies the prompt and shows instructions to paste into Windows Copilot; `chatgpt` calls the OpenAI API and shows results in VS Code.
+- `copilotCrossRef.openaiModel`: OpenAI model name used when `target=chatgpt`.
+- `copilotCrossRef.openaiBaseUrl`: OpenAI API base URL (only needed for proxies/gateways).
 - `copilotCrossRef.copilotUrl`: Base URL for Copilot (default `https://copilot.microsoft.com/`).
 - `copilotCrossRef.openInSimpleBrowser`: Open inside VS Code Simple Browser.
 - `copilotCrossRef.prefillQueryInUrl`: Best-effort prefill via URL param (off by default).
 - `copilotCrossRef.promptTemplate`: Template for the prompt. Use `{{text}}`.
 - `copilotCrossRef.copyPromptToClipboard`: Copy prompt to clipboard (on by default).
+
+## ChatGPT setup
+
+1. Set `copilotCrossRef.target` to `chatgpt`.
+2. Run **Copilot Cross-Reference: Set OpenAI API Key**.
+3. Use either **Ask … About Selection** or **Ask … (Prompt)**.
 
 ## Run & debug
 

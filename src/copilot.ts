@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 
 export type CopilotCrossRefConfig = {
+  target: 'web' | 'windows' | 'chatgpt';
+  openaiModel: string;
+  openaiBaseUrl: string;
   copilotUrl: string;
   openInSimpleBrowser: boolean;
   prefillQueryInUrl: boolean;
@@ -10,7 +13,11 @@ export type CopilotCrossRefConfig = {
 
 export function getConfig(): CopilotCrossRefConfig {
   const cfg = vscode.workspace.getConfiguration('copilotCrossRef');
+  const target = cfg.get<string>('target', 'web');
   return {
+    target: target === 'windows' ? 'windows' : target === 'chatgpt' ? 'chatgpt' : 'web',
+    openaiModel: cfg.get<string>('openaiModel', 'gpt-4o-mini'),
+    openaiBaseUrl: cfg.get<string>('openaiBaseUrl', 'https://api.openai.com/v1'),
     copilotUrl: cfg.get<string>('copilotUrl', 'https://copilot.microsoft.com/'),
     openInSimpleBrowser: cfg.get<boolean>('openInSimpleBrowser', true),
     prefillQueryInUrl: cfg.get<boolean>('prefillQueryInUrl', false),
@@ -73,4 +80,12 @@ export async function openCopilot(url: URL, openInSimpleBrowser: boolean): Promi
   }
 
   await vscode.env.openExternal(vscode.Uri.parse(urlString));
+}
+
+export async function guideWindowsCopilot(promptWasCopied: boolean): Promise<void> {
+  const msg = promptWasCopied
+    ? 'Prompt copied. Open Windows Copilot (Win+C) and paste it.'
+    : 'Open Windows Copilot (Win+C).';
+
+  await vscode.window.showInformationMessage(msg);
 }

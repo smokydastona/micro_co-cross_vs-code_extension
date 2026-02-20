@@ -13,7 +13,9 @@
   "activationEvents": [
     "onCommand:copilotCrossRef.open",
     "onCommand:copilotCrossRef.askSelection",
-    "onCommand:copilotCrossRef.askPrompt"
+    "onCommand:copilotCrossRef.askPrompt",
+    "onCommand:copilotCrossRef.setOpenAIApiKey",
+    "onCommand:copilotCrossRef.clearOpenAIApiKey"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -29,11 +31,35 @@
       {
         "command": "copilotCrossRef.askPrompt",
         "title": "Copilot Cross-Reference: Ask Microsoft Copilot (Prompt)"
+      },
+      {
+        "command": "copilotCrossRef.setOpenAIApiKey",
+        "title": "Copilot Cross-Reference: Set OpenAI API Key"
+      },
+      {
+        "command": "copilotCrossRef.clearOpenAIApiKey",
+        "title": "Copilot Cross-Reference: Clear OpenAI API Key"
       }
     ],
     "configuration": {
       "title": "Copilot Cross-Reference",
       "properties": {
+        "copilotCrossRef.target": {
+          "type": "string",
+          "enum": ["web", "windows", "chatgpt"],
+          "default": "web",
+          "description": "Where to send prompts: 'web' opens copilot.microsoft.com; 'windows' copies prompt to clipboard and shows instructions for Windows Copilot; 'chatgpt' calls the OpenAI API and shows results in VS Code."
+        },
+        "copilotCrossRef.openaiModel": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "OpenAI model to use when target is 'chatgpt'."
+        },
+        "copilotCrossRef.openaiBaseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1",
+          "description": "Base URL for OpenAI API (only needed for proxies/enterprise gateways)."
+        },
         "copilotCrossRef.copilotUrl": {
           "type": "string",
           "default": "https://copilot.microsoft.com/",
@@ -66,6 +92,9 @@
     "compile": "tsc -p .",
     "watch": "tsc -watch -p .",
     "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "openai": "^4.79.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
