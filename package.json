@@ -20,6 +20,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onCommand:copilotCrossRef.open",
     "onCommand:copilotCrossRef.askSelection",
     "onCommand:copilotCrossRef.askPrompt",
@@ -78,6 +79,11 @@
           "type": "string",
           "default": "https://api.openai.com/v1",
           "description": "Base URL for OpenAI API (only needed for proxies/enterprise gateways)."
+        },
+        "copilotCrossRef.onboardingPrompt": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, prompts to set an OpenAI API key on startup if target is 'chatgpt' and no key is stored."
         },
         "copilotCrossRef.debateMaxRounds": {
           "type": "number",

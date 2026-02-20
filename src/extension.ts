@@ -3,7 +3,51 @@ import { buildPrompt, buildPromptFromSelection, getConfig, getCopilotBaseUrl, ge
 import { askChatGPT, clearOpenAIApiKey, debateChatGPTUntilChecklistEmpty, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
 import { showTextPanel } from './webview';
 
+const ONBOARDING_SUPPRESS_KEY = 'copilotCrossRef.suppressOnboardingPrompt';
+
+async function maybePromptForOpenAIKey(context: vscode.ExtensionContext): Promise<void> {
+  const config = getConfig();
+  const onboardingEnabled = vscode.workspace.getConfiguration('copilotCrossRef').get<boolean>('onboardingPrompt', true);
+
+  if (!onboardingEnabled) {
+    return;
+  }
+
+  if (config.target !== 'chatgpt') {
+    return;
+  }
+
+  const suppressed = context.globalState.get<boolean>(ONBOARDING_SUPPRESS_KEY, false);
+  if (suppressed) {
+    return;
+  }
+
+  const existingKey = await getOpenAIApiKey(context);
+  if (existingKey) {
+    return;
+  }
+
+  const choice = await vscode.window.showInformationMessage(
+    'Copilot Cross-Reference: ChatGPT mode is enabled but no OpenAI API key is set.',
+    'Set API Key',
+    'Not now',
+    "Don't ask again"
+  );
+
+  if (choice === 'Set API Key') {
+    await vscode.commands.executeCommand('copilotCrossRef.setOpenAIApiKey');
+    return;
+  }
+
+  if (choice === "Don't ask again") {
+    await context.globalState.update(ONBOARDING_SUPPRESS_KEY, true);
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
+  // Fire-and-forget onboarding prompt; keep activation snappy.
+  void maybePromptForOpenAIKey(context);
+
   context.subscriptions.push(
     vscode.commands.registerCommand('copilotCrossRef.setOpenAIApiKey', async () => {
       const apiKey = await vscode.window.showInputBox({
@@ -18,6 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       await setOpenAIApiKey(context, apiKey.trim());
+      // If the user previously suppressed onboarding, keep it suppressed.
       vscode.window.showInformationMessage('OpenAI API key saved.');
     })
   );
@@ -25,6 +70,8 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('copilotCrossRef.clearOpenAIApiKey', async () => {
       await clearOpenAIApiKey(context);
+      // If user clears the key, allow onboarding to help again.
+      await context.globalState.update(ONBOARDING_SUPPRESS_KEY, false);
       vscode.window.showInformationMessage('OpenAI API key cleared.');
     })
   );
