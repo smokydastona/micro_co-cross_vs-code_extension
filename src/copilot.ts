@@ -4,6 +4,7 @@ export type CopilotCrossRefConfig = {
   target: 'web' | 'windows' | 'chatgpt';
   openaiModel: string;
   openaiBaseUrl: string;
+  debateMaxRounds: number;
   copilotUrl: string;
   openInSimpleBrowser: boolean;
   prefillQueryInUrl: boolean;
@@ -16,8 +17,9 @@ export function getConfig(): CopilotCrossRefConfig {
   const target = cfg.get<string>('target', 'web');
   return {
     target: target === 'windows' ? 'windows' : target === 'chatgpt' ? 'chatgpt' : 'web',
-    openaiModel: cfg.get<string>('openaiModel', 'gpt-4o-mini'),
+    openaiModel: cfg.get<string>('openaiModel', 'gpt-4.1'),
     openaiBaseUrl: cfg.get<string>('openaiBaseUrl', 'https://api.openai.com/v1'),
+    debateMaxRounds: cfg.get<number>('debateMaxRounds', 6),
     copilotUrl: cfg.get<string>('copilotUrl', 'https://copilot.microsoft.com/'),
     openInSimpleBrowser: cfg.get<boolean>('openInSimpleBrowser', true),
     prefillQueryInUrl: cfg.get<boolean>('prefillQueryInUrl', false),

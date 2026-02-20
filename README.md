@@ -37,6 +37,7 @@ So this extension provides a practical workflow:
 - `copilotCrossRef.target`: `web` (default) opens copilot.microsoft.com; `windows` copies the prompt and shows instructions to paste into Windows Copilot; `chatgpt` calls the OpenAI API and shows results in VS Code.
 - `copilotCrossRef.openaiModel`: OpenAI model name used when `target=chatgpt`.
 - `copilotCrossRef.openaiBaseUrl`: OpenAI API base URL (only needed for proxies/gateways).
+- `copilotCrossRef.debateMaxRounds`: Max Critic→Builder rounds. Debate stops early when the checklist has no `- [ ]` items.
 - `copilotCrossRef.copilotUrl`: Base URL for Copilot (default `https://copilot.microsoft.com/`).
 - `copilotCrossRef.openInSimpleBrowser`: Open inside VS Code Simple Browser.
 - `copilotCrossRef.prefillQueryInUrl`: Best-effort prefill via URL param (off by default).
@@ -53,6 +54,8 @@ So this extension provides a practical workflow:
 
 - Select text and run **Debate in ChatGPT (Selection)**, or
 - Run **Debate in ChatGPT (Prompt)** and type your idea.
+
+The debate loop continues until the **Action Items** checklist contains no unchecked items (`- [ ]`), or until `copilotCrossRef.debateMaxRounds` is reached.
 
 ## Run & debug
 

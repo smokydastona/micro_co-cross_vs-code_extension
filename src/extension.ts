@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { buildPrompt, buildPromptFromSelection, getConfig, getCopilotBaseUrl, getCopilotUrlWithQuery, guideWindowsCopilot, openCopilot } from './copilot';
-import { askChatGPT, clearOpenAIApiKey, debateChatGPT, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
+import { askChatGPT, clearOpenAIApiKey, debateChatGPTUntilChecklistEmpty, getOpenAIApiKey, setOpenAIApiKey } from './openaiChat';
 import { showTextPanel } from './webview';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -56,13 +56,15 @@ export function activate(context: vscode.ExtensionContext) {
           title: `Debating in ChatGPT (${config.openaiModel})…`
         },
         async () => {
-          const { report } = await debateChatGPT({
+          const { report, rounds, stoppedBecause } = await debateChatGPTUntilChecklistEmpty({
             apiKey,
             baseUrl: config.openaiBaseUrl,
             model: config.openaiModel,
-            topicText: selectionText
+            topicText: selectionText,
+            maxRounds: config.debateMaxRounds
           });
-          showTextPanel({ title: 'ChatGPT Debate', bodyText: report });
+          const suffix = stoppedBecause === 'checklist-empty' ? `(${rounds} rounds, done)` : `(${rounds} rounds, max)`;
+          showTextPanel({ title: `ChatGPT Debate ${suffix}`, bodyText: report });
         }
       );
     })
@@ -98,13 +100,15 @@ export function activate(context: vscode.ExtensionContext) {
           title: `Debating in ChatGPT (${config.openaiModel})…`
         },
         async () => {
-          const { report } = await debateChatGPT({
+          const { report, rounds, stoppedBecause } = await debateChatGPTUntilChecklistEmpty({
             apiKey,
             baseUrl: config.openaiBaseUrl,
             model: config.openaiModel,
-            topicText
+            topicText,
+            maxRounds: config.debateMaxRounds
           });
-          showTextPanel({ title: 'ChatGPT Debate', bodyText: report });
+          const suffix = stoppedBecause === 'checklist-empty' ? `(${rounds} rounds, done)` : `(${rounds} rounds, max)`;
+          showTextPanel({ title: `ChatGPT Debate ${suffix}`, bodyText: report });
         }
       );
     })
