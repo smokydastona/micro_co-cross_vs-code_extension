@@ -114,6 +114,11 @@ The debate loop continues until the **Action Items** checklist contains no unche
 4. Use **Stop Conversation** to abort the current run (the transcript stays open for review/export).
 5. Use **Export Transcript** to save as `.md` or `.json`.
 
+Auto-detection:
+
+- If you have not explicitly set `copilotCrossRef.broker.modelA.provider` / `copilotCrossRef.broker.modelB.provider`, the extension will first try to detect a running local model endpoint (LM Studio `http://localhost:1234/v1`, Ollama `http://localhost:11434/v1`) and use it automatically.
+- If no local endpoint is detected, it will ask what you want to do (open broker settings, use ChatGPT, or cancel).
+
 If you select `checklistEmpty` as the stop condition, the broker will stop early when the last assistant message has no unchecked checklist items (no lines like `- [ ] ...`).
 
 ## Install
